@@ -1,8 +1,8 @@
 const mysql = require('mysql');
 
 const connection = mysql.createConnection({
-    connectionLimit: 10,
-    host: "srv1132.hstgr.io", 
+    // connectionLimit: 10,
+    host: "srv1132.hstgr.io",
     user: "u160357475_aims_client", 
     password: "MysqlAdmin@123", 
     database: "u160357475_aims",

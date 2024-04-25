@@ -2,6 +2,21 @@ const connection = require("../dbConnection");
 const util = require("util");
 const query = util.promisify(connection.query).bind(connection);
 
+const getUserByEmail = async (user_email) => {
+  try {
+    const Query = "SELECT * FROM aims_user WHERE user_email = ?";
+    const [rows] = await query(Query, [user_email]);
+
+    if (!rows || rows.length === 0) {
+      return false; // Return false to indicate that email is not found
+    }
+
+    return rows[0];
+  } catch (error) {
+    throw error;
+  }
+};
+
 const createUser = async (user_name, user_last_name, user_email, user_role, user_mobile, user_password) => {
   try {
     const Query = "INSERT INTO aims_user (user_name, user_last_name, user_email, user_mobile, user_role, user_password) VALUES (?, ?, ?, ?, ?, ?)";
@@ -41,6 +56,7 @@ const deleteUser = async (userId) => {
     throw error;
   }
 };
+
 const updateUser = async (userId, user_name, user_last_name, user_email, user_role, user_mobile, user_password) => {
   try {
     const Query = "UPDATE aims_user SET user_name = ?, user_last_name = ?, user_email = ?, user_mobile = ?, user_role = ?, user_password = ? WHERE user_id = ?";
@@ -50,4 +66,5 @@ const updateUser = async (userId, user_name, user_last_name, user_email, user_ro
     throw error;
   }
 };
-module.exports = { createUser,findAllUsers,getUserById,deleteUser,updateUser };
+
+module.exports = { getUserByEmail,createUser,findAllUsers,getUserById,deleteUser,updateUser };

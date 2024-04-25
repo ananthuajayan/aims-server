@@ -1,5 +1,10 @@
 const userModel = require("../model/userModel");
 const argon = require("argon2");
+const nodemailer = require('nodemailer');
+
+
+
+
 
 
 const getUser = async (req, res) => {
@@ -37,26 +42,46 @@ const createUser = async (req, res) => {
     user_password,
     confirm_password,
   } = req.body;
+
+  // Check if the passwords match
   if (user_password !== confirm_password) {
     return res
       .status(400)
       .json({ msg: "confirm password doesn't match with the password" });
   }
+
   try {
-    // Hash the password before saving it
+    // Check if the user already exists
+    const existingUser = await userModel.getUserByEmail(user_email);
+    if (existingUser === false){
+      // Hash the password before saving it
     const hashedPassword = await argon.hash(user_password);
+
     // Create a new user in the database
-    const user = await userModel.createUser(
+    const userId = await userModel.createUser(
       user_name,
       user_last_name,
       user_email,
       user_role,
       user_mobile,
-      hashedPassword
+      hashedPassword,
     );
-    res.status(201).json({ msg: "User created successfully", user });
+
+    res.status(201).json({ msg: "User created successfully", userId });
+    }
+    else{
+      res.status(400).json({ msg: "User already registered"});
+
+    }
+
+    
   } catch (error) {
-    res.status(500).json({ msg: error.message });
+    // Check if the error is due to a duplicate email constraint violation
+    if (error.code === "SQLITE_CONSTRAINT" && error.message.includes("UNIQUE constraint failed")) {
+      return res.status(400).json({ msg: "User with this email already exists" });
+    }
+    console.error("Error creating user:", error);
+    res.status(500).json({ msg: "Failed to create user" });
   }
 };
 
