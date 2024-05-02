@@ -2,6 +2,7 @@ const connection = require("../dbConnection");
 const util = require("util");
 const query = util.promisify(connection.query).bind(connection);
 
+
 const getUserByEmail = async (user_email) => {
   try {
     const Query = "SELECT * FROM aims_user WHERE user_email = ?";
@@ -26,6 +27,30 @@ const createUser = async (user_name, user_last_name, user_email, user_role, user
     throw error;
   }
 };
+
+const logUser = async ({ user_email, user_password }) => {
+  try {
+    console.log("Email:", user_email);
+    console.log("Password:", user_password);
+
+    const queryString = "SELECT * FROM aims_user WHERE user_email = ? AND user_password = ?";
+    console.log("Query:", queryString);
+
+    const result = await connection.query(queryString, [user_email, user_password]);
+    console.log("Query Result:", result);
+
+    if (result.length === 0) {
+      throw new Error("Invalid email or password");
+    }
+
+    return result[0];
+  } catch (error) {
+    console.error("Error in logUser:", error);
+    throw error;
+  }
+};
+
+
 
 const findAllUsers = async () => {
   try {
@@ -67,4 +92,4 @@ const updateUser = async (userId, user_name, user_last_name, user_email, user_ro
   }
 };
 
-module.exports = { getUserByEmail,createUser,findAllUsers,getUserById,deleteUser,updateUser };
+module.exports = { getUserByEmail,createUser,findAllUsers,getUserById,deleteUser,updateUser,logUser };
