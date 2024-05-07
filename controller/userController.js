@@ -1,17 +1,18 @@
 const userModel = require("../model/userModel");
-const argon = require("argon2");
 const nodemailer = require('nodemailer');
+var bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken');
 
 let transporter = nodemailer.createTransport({
-    host: "smtp.hostinger.com",
-    port: 587,
-    auth: {
-      type: 'custom',
-      method: 'PLAIN',
-      user: 'info@lunarenp.com',
-      pass: 'info123abcAB@',
-    },
-  });
+  host: "smtp.hostinger.com", 
+  port: 587,
+  auth: {
+    type: 'custom',
+    method: 'PLAIN',
+    user: 'info@lunarenp.com',
+    pass: 'info123abcAB@',
+  },
+});
 
 const getUser = async (req, res) => {
   try {
@@ -59,7 +60,8 @@ const createUser = async (req, res) => {
     const existingUser = await userModel.getUserByEmail(user_email);
     if (existingUser === false) {
       // Hash the password before saving it
-      const hashedPassword = await argon.hash(user_password);
+      var salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(user_password, salt);
 
       // Create a new user in the database
       const userId = await userModel.createUser(
@@ -77,7 +79,8 @@ const createUser = async (req, res) => {
         to: user_email,
         subject: 'Email Verification',
         text: 'Please verify your email address by clicking the following link:',
-        html: '<p>Please click <a href="http://yourverificationlink.com">here</a> to verify your email address.</p>',
+        html: `<p>Please <a href="https://lunarsenterprises.com:4000/mail-verification/${userId}">click here</a> for verification to verify your email address.</p>
+        `,
       };
 
       transporter.sendMail(mailOptions, (error, info) => {
@@ -112,23 +115,33 @@ const logInUser = async (req, res) => {
     }
 
     // Call the userModel.logUser function with an object containing email and password
-    const user = await userModel.logUser({ user_email, user_password });
-
+    var user = await userModel.logUser(user_email);
     if (!user) {
-      return res.status(401).json({ message: "Invalid email or password" });
+      return res.status(401).json({ message: "User not found" });
     }
 
-    // If user is found, send a success response with user details
-    res.status(200).json({ message: "Login successful", user: {
-      userName: user_email,
-    } });
+    var CheckPassword = await bcrypt.compare(user_password, user.user_password);
+    if (!CheckPassword) {
+      return res.status(401).json({ message: "Password is wrong, please check your password and try again" });
+    }
+
+    // If user is authenticated, generate JWT token
+    const token = jwt.sign({ user_mail:user.user_mail }, process.env.SECRET_KEY, { expiresIn: '1h' });
+
+    // If user is found and password is correct, send a success response with JWT token
+    return res.status(200).json({
+      message: "Login successful", 
+      user: {
+        userName: user_email,
+      },
+      token: token
+    });
   } catch (error) {
     // If an error occurs, send an error response
     console.error("Login failed:", error.message);
-    res.status(500).json({ error: "Login failed" });
+    res.status(500).json({ message: error.message });
   }
 };
-
 
 const updateUser = async (req, res) => {
   const userId = req.params.id;
@@ -173,5 +186,89 @@ const deleteUser = async (req, res) => {
   }
 };
 
+var MailVerification = async (req, res) => {
+  var user_id = req.params.id;
+  var data = await userModel.UpdateMailverify(user_id);
+  if (data == true) {
+    return res.send(`<!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Registration Success</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #f4f4f4;
+                text-align: center;
+                padding: 20px;
+            }
+            .container {
+                max-width: 600px;
+                margin: 0 auto;
+                background-color: #7bd148;
+                border-radius: 8px;
+                padding: 20px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            }
+            h1 {
+                color: #fff;
+            }
+            p {
+                color: #fff;
+                margin-bottom: 20px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Registration Successful!</h1>
+            <p>Your account has been successfully registered. You can now login using your credentials.</p>
+        </div>
+    </body>
+    </html>
+    `);
+  } else {
+    return res.send(`<!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Registration Failed</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #f4f4f4;
+                text-align: center;
+                padding: 20px;
+            }
+            .container {
+                max-width: 600px;
+                margin: 0 auto;
+                background-color: #ff6363; /* Red color */
+                border-radius: 8px;
+                padding: 20px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            }
+            h1 {
+                color: #fff; /* White text */
+            }
+            p {
+                color: #fff; /* White text */
+                margin-bottom: 20px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Registration Failed</h1>
+            <p>Sorry, registration failed. Please try again.</p>
+        </div>
+    </body>
+    </html>
+    `);
+  };
 
-module.exports = { getUser, getUserById,logInUser, createUser, updateUser, deleteUser };
+};
+
+module.exports = { getUser, getUserById, logInUser, createUser, updateUser, deleteUser, MailVerification };
