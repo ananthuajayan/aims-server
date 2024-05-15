@@ -4,14 +4,15 @@ const router = express.Router();
 const { getUser, getUserById, createUser,logInUser,updateUser,deleteUser,MailVerification} = require('../controller/userController');
 const {forgotPassword} = require('../controller/forgotPasswordController');
 const {verifyToken} = require('../controller/varify_token_controller');
-const {changePassword}=require('../controller/change_pass_controller')
-const {logout}= require('../controller/logout_controller')
+const {changePassword}=require('../controller/change_pass_controller');
+const {logout}= require('../controller/logout_controller');
+const {getAllClients,deleteClient,updateClient} = require('../controller/client_controller')
 
 router.get('/users',getUser);
 
 router.get('/users/:id',getUserById);
 
-router.post('/users',createUser);
+router.post('/users/create',createUser);
 
 router.post('/users/login',logInUser);
 
@@ -28,5 +29,13 @@ router.post("/verify",verifyToken) ;
 router.post('/users/change_password',changePassword);
 
 router.post('/logout', logout);
+
+// Client route
+
+router.get('/clients',getAllClients)
+
+router.delete('/clients/:id',deleteClient)
+
+router.patch('/clients/update/:id',updateClient)
 
 module.exports= router;
