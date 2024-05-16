@@ -6,7 +6,7 @@ const {forgotPassword} = require('../controller/forgotPasswordController');
 const {verifyToken} = require('../controller/varify_token_controller');
 const {changePassword}=require('../controller/change_pass_controller');
 const {logout}= require('../controller/logout_controller');
-const {getAllClients,deleteClient,updateClient} = require('../controller/client_controller')
+const {getAllClients,deleteClient,updateClient,addClient} = require('../controller/client_controller')
 
 router.get('/users',getUser);
 
@@ -32,10 +32,13 @@ router.post('/logout', logout);
 
 // Client route
 
-router.get('/clients',getAllClients)
+router.get('/clients',getAllClients);
 
-router.delete('/clients/:id',deleteClient)
+router.delete('/clients/:id',deleteClient);
 
-router.patch('/clients/update/:id',updateClient)
+router.patch('/clients/update/:id',updateClient);
+
+router.post('/client/add',addClient);
+
 
 module.exports= router;
