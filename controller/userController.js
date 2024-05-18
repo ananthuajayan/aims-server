@@ -124,8 +124,13 @@ const logInUser = async (req, res) => {
       return res.status(401).json({ message: "Password is wrong, please check your password and try again" });
     }
 
+    const payload = {
+      user_email: user.user_email,
+      username: user.user_name
+    };
+
     const token = jwt.sign(
-      { user_mail: user.user_email, username: user.username },
+      payload,
       process.env.SECRET_KEY,
       { expiresIn: '1h' }
     );
@@ -133,7 +138,7 @@ const logInUser = async (req, res) => {
     return res.status(200).json({
       message: "Login successful",
       user: {
-        userName: user.username,
+        userName: user.user_name,
         email: user.user_email,
       },
       token: token

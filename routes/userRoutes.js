@@ -34,9 +34,9 @@ router.post('/logout', logout);
 
 router.get('/clients',getAllClients);
 
-router.delete('/clients/delete/:id', deleteClient);
+router.delete('/clients/delete/:id',jwtmiddleware, deleteClient);
 
-router.patch('/clients/update/:id', updateClient);
+router.patch('/clients/update/:id',jwtmiddleware, updateClient);
 
 router.post('/client/add',addClient);
 

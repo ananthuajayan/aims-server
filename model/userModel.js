@@ -48,7 +48,7 @@ var logUser = async (user_email) => {
 
 var findAllUsers = async () => {
   try {
-    var Query = "SELECT * FROM aims_user";
+    var Query = `SELECT * FROM aims_user WHERE user_status = 'active'`;
     var users = await query(Query);
     return users;
   } catch (error) {
@@ -68,7 +68,7 @@ var getUserById = async (userId) => {
 
 var deleteUser = async (userId) => {
   try {
-    var Query = "DELETE FROM aims_user WHERE user_id = ?";
+    var Query = `UPDATE aims_user SET user_status = 'inactive' WHERE user_id=?`;
     var result = await query(Query, [userId]);
     return result.affectedRows > 0;
   } catch (error) {
