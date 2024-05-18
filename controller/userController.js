@@ -114,34 +114,36 @@ const logInUser = async (req, res) => {
       return res.status(400).json({ error: "Email and password are required" });
     }
 
-    // Call the userModel.logUser function with an object containing email and password
-    var user = await userModel.logUser(user_email);
+    const user = await userModel.logUser(user_email);
     if (!user) {
       return res.status(401).json({ message: "User not found" });
     }
 
-    var CheckPassword = await bcrypt.compare(user_password, user.user_password);
-    if (!CheckPassword) {
+    const checkPassword = await bcrypt.compare(user_password, user.user_password);
+    if (!checkPassword) {
       return res.status(401).json({ message: "Password is wrong, please check your password and try again" });
     }
 
-    // If user is authenticated, generate JWT token
-    const token = jwt.sign({ user_mail:user.user_mail }, process.env.SECRET_KEY, { expiresIn: '1h' });
+    const token = jwt.sign(
+      { user_mail: user.user_email, username: user.username },
+      process.env.SECRET_KEY,
+      { expiresIn: '1h' }
+    );
 
-    // If user is found and password is correct, send a success response with JWT token
     return res.status(200).json({
-      message: "Login successful", 
+      message: "Login successful",
       user: {
-        userName: user_email,
+        userName: user.username,
+        email: user.user_email,
       },
       token: token
     });
   } catch (error) {
-    // If an error occurs, send an error response
     console.error("Login failed:", error.message);
     res.status(500).json({ message: error.message });
   }
 };
+
 
 const updateUser = async (req, res) => {
   const userId = req.params.id;

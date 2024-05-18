@@ -12,22 +12,25 @@ const getAllClients = async (req, res) => {
 
 const deleteClient = async (req, res) => {
   const userId = req.params.id;
+
   try {
     const user = await clientModal.getClientById(userId);
     if (!user) {
-      return res.status(500).json({
-        msg: "user cannot be found",
+      return res.status(404).json({
+        msg: "User cannot be found",
       });
     }
+
     const deletedClient = await clientModal.deleteClient(userId);
     if (deletedClient) {
-      res.status(200).json({ msg: "user deleted sucessfully" });
+      res.status(200).json({ msg: "User deleted successfully" });
     } else {
-      res.status(201).json({ msg: "failed to delete the client" });
+      res.status(500).json({ msg: "Failed to delete the client" });
     }
   } catch (error) {
+    console.error(error);
     res.status(500).json({
-      msg: message.error,
+      msg: "An error occurred while deleting the user",
     });
   }
 };
@@ -65,9 +68,10 @@ const updateClient = async (req, res) => {
     if (updatedClient) {
       console.log(updatedClient);
       res.status(200).json({ msg: "User updated successfully" });
-    } else {
+    } 
+    else {
       res.status(500).json({ msg: "Failed to update user" });
-    }
+     }
   } catch (error) {
     throw error;
   }

@@ -28,20 +28,18 @@ var createUser = async (user_name, user_last_name, user_email, user_role, user_m
 
 var logUser = async (user_email) => {
   try {
-
     var queryString = "SELECT * FROM aims_user WHERE user_email = ?";
     var result = await query(queryString, [user_email]);
     console.log("Query Result:", result);
 
     if (result.length == 0) {
-      throw new Error("Invalid email,pls check and try again");
-    }else{
-      if(result[0].email_verification=='no'){
-        throw new Error("mail not verified,pls check ur mail and verify");
+      throw new Error("Invalid email, please check and try again");
+    } else {
+      if (result[0].email_verification == 'no') {
+        throw new Error("Mail not verified, please check your mail and verify");
       }
-      return result[0];
+      return result[0];  // Ensure result[0] contains username
     }
-  
   } catch (error) {
     console.error("Error in logUser:", error);
     throw error;

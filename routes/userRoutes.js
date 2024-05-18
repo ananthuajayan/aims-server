@@ -22,7 +22,7 @@ router.patch('/users/:id',jwtmiddleware,updateUser);
 
 router.delete('/users/:id',jwtmiddleware,deleteUser);
 
-router.get('/mail-verification/:id',MailVerification)
+router.get('/mail-verification/:id',MailVerification);
 
 router.post("/verify",verifyToken) ;
 
@@ -34,9 +34,9 @@ router.post('/logout', logout);
 
 router.get('/clients',getAllClients);
 
-router.delete('/clients/:id',deleteClient);
+router.delete('/clients/delete/:id', deleteClient);
 
-router.patch('/clients/update/:id',updateClient);
+router.patch('/clients/update/:id', updateClient);
 
 router.post('/client/add',addClient);
 
