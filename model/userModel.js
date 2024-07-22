@@ -16,10 +16,10 @@ const getUserByEmail = async (user_email) => {
   }
 };
 
-var createUser = async (user_name, user_last_name, user_email, user_role, user_mobile, user_password) => {
+var createUser = async (user_name, user_email,user_password) => {
   try {
-    var Query = "INSERT INTO aims_user (user_name, user_last_name, user_email, user_mobile, user_role, user_password) VALUES (?, ?, ?, ?, ?, ?)";
-    var result = await query(Query, [user_name, user_last_name, user_email, user_mobile, user_role, user_password]);
+    var Query = "INSERT INTO aims_user (user_name, user_email,user_password) VALUES (?, ?, ?, ?, ?, ?)";
+    var result = await query(Query, [user_name, user_email,user_password]);
     return result.insertId;
   } catch (error) {
     throw error;

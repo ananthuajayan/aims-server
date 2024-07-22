@@ -99,7 +99,7 @@ const addClient = async (req, res) => {
     !client_contract_end_date ||
     !client_insurance_status
   ) {
-    return res.status(400).json({ msg: "Kindly fill the missing fields" });
+    return res.status(400).json({ msg: "fill the missing fields" });
   }
   else{
     try {

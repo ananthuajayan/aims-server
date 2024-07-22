@@ -30,7 +30,7 @@ router.post('/users/change_password',changePassword);
 
 router.post('/logout', logout);
 
-// Client route
+// Client route--------------------------------------
 
 router.get('/clients',getAllClients);
 

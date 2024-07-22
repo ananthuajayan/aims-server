@@ -40,10 +40,7 @@ const getUserById = async (req, res) => {
 const createUser = async (req, res) => {
   const {
     user_name,
-    user_last_name,
     user_email,
-    user_role,
-    user_mobile,
     user_password,
     confirm_password,
   } = req.body;
@@ -66,10 +63,7 @@ const createUser = async (req, res) => {
       // Create a new user in the database
       const userId = await userModel.createUser(
         user_name,
-        user_last_name,
         user_email,
-        user_role,
-        user_mobile,
         hashedPassword,
       );
 
